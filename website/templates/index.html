@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Prediction</title>
+</head>
+<body>
+    <h1>Upload Your Crypto Dataset for Prediction</h1>
+    
+    <form id="uploadForm">
+        <input type="file" id="csvFile" name="file" accept=".csv">
+        <button type="submit">Predict</button>
+    </form>
+
+    <h3>Predictions:</h3>
+    <div id="predictions"></div>
+
+    <script>
+        document.getElementById('uploadForm').onsubmit = async function(e) {
+            e.preventDefault();
+            
+            let formData = new FormData();
+            let fileInput = document.getElementById('csvFile');
+            formData.append("file", fileInput.files[0]);
+
+            try {
+                let response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    let data = await response.json();
+                    document.getElementById('predictions').innerHTML = data.predictions.join('<br>');
+                } else {
+                    document.getElementById('predictions').innerHTML = "Error: " + (await response.json()).error;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('predictions').innerHTML = "Error uploading file!";
+            }
+        };
+    </script>
+</body>
+</html>
